@@ -15,11 +15,24 @@ describe('#consumeTo', function(){
     parser = new Parser('first this# then this.');
   });
 
-  it('returns a string through the character', function(){
-    var first = parser.consumeTo('#');
-    var second = parser.consumeTo('.');
+  context('single character', function(){
+    it('returns a string through the character', function(){
+      var first = parser.consumeTo('#');
+      var second = parser.consumeTo('.');
 
-    expect(first).toBe('first this#');
-    expect(second).toBe(' then this.');
+      expect(first).toBe('first this#');
+      expect(second).toBe(' then this.');
+    });
+  });
+
+  context('longer string', function(){
+    it('returns a string through the test string', function(){
+      var first = parser.consumeTo('this');
+      var second = parser.consumeTo('this.');
+
+      expect(first).toBe('first this');
+      expect(second).toBe('# then this.');
+    });
   });
 });
+

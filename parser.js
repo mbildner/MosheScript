@@ -1,3 +1,8 @@
+function endsWith (haystack, needle){
+  'use strict';
+  return new RegExp(needle + '$').test(haystack);
+}
+
 function Parser (src){
   'use strict';
   var anchor = 0;
@@ -27,12 +32,25 @@ function Parser (src){
     scout += 1;
   }
 
-  function advanceTo (char){
-    while (currentChar() !== char){
+  function advanceTo (flag){
+    var isChar = typeof flag === 'string' && flag.length < 2;
+    var isString = typeof flag === 'string' && flag.length > 1;
+    var isRegex = typeof flag !== 'string';
+
+    if (isChar) {
+      while (currentChar() !== flag){
+        advance();
+        if (self.FINISHED){ break; }
+      }
       advance();
-      if (self.FINISHED){ break; }
     }
-    advance();
+
+    if (isString) {
+      while (!endsWith(string(), flag)){
+        advance();
+        if (self.FINISHED){ break; }
+      }
+    }
   }
 
   function consumeTo (char){

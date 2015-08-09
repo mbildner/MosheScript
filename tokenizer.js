@@ -2,7 +2,7 @@ var Parser = require('./parser.js');
 
 
 var IDENTIFIER_REGEX = /^func/;
-var FUNC_NAME_REGEX = /\s+\w+\s*\(/;
+var FUNC_NAME_REGEX = /\s*\(/;
 var PARAM_REGEX = /,|\)/;
 var STRAY_PARAM_REGEX = /\s*\)/;
 var RETURN_STATEMENT_REGEX = /\n*\s*return\s*/;
@@ -16,7 +16,7 @@ function Tokenizer (src){
     var identifier = parser.consumeTo(IDENTIFIER_REGEX);
     var name = parser.consumeTo(FUNC_NAME_REGEX);
 
-    var cleanName = name.replace(/\s*\(/, '').replace(/^\s*/, '');
+    var cleanName = name.replace(/\s*\(/, '').replace(/^\s*/, '') || false;
 
     var params = [];
     var param;

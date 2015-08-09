@@ -1,12 +1,12 @@
-'use strict';
-
 function Parser (src){
+  'use strict';
   var anchor = 0;
   var scout = 0;
   var self = this;
 
   this.FINISHED = false;
   this.consumeTo = consumeTo;
+  this.consumeThrough = consumeThrough;
 
   function string (){
     var str = src.slice(anchor, scout);
@@ -33,6 +33,21 @@ function Parser (src){
       advance();
       if (self.FINISHED){ break; }
     }
+  }
+
+  function advanceThrough (char) {
+    while (currentChar() !== char){
+      advance();
+      if (self.FINISHED){ break; }
+    }
+    advance();
+  }
+
+  function consumeThrough (char){
+    advanceThrough(char);
+    var str = string();
+    finish();
+    return str;
   }
 
   function consumeTo (char){

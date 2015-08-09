@@ -1,4 +1,12 @@
 {
   "node": true,
-  "jasmine": true
+  "jasmine": true,
+  "undef": true,
+  "latedef": "nofunc",
+  "eqeqeq": true,
+  "globals": {
+    "context": true,
+    "fcontext": true,
+    "xcontext": true
+  }
 }

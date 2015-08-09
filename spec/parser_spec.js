@@ -1,12 +1,6 @@
 'use strict';
 
-var fs = require('fs');
 var Parser = require('../parser.js');
-
-var demo = fs.readFileSync('./demo.ms', { encoding: 'UTF-8' });
-
-beforeEach(function(){
-});
 
 describe('#consumeTo', function(){
   var parser;

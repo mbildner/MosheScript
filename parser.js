@@ -1,6 +1,10 @@
 function endsWith (haystack, needle){
   'use strict';
-  return new RegExp(needle + '$').test(haystack);
+  if (typeof needle === 'string') {
+    needle = new RegExp(needle + '$');
+  }
+
+  return needle.test(haystack);
 }
 
 function Parser (src){
@@ -45,7 +49,7 @@ function Parser (src){
       advance();
     }
 
-    if (isString) {
+    if (!isChar) {
       while (!endsWith(string(), flag)){
         advance();
         if (self.FINISHED){ break; }

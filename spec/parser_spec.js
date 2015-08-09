@@ -34,5 +34,15 @@ describe('#consumeTo', function(){
       expect(second).toBe('# then this.');
     });
   });
+
+  context('regex', function(){
+    it('returns a string through the regex', function(){
+      var first = parser.consumeTo(/this[\.#]{1}/);
+      var second = parser.consumeTo(/this[\.#]{1}/);
+
+      expect(first).toBe('first this#');
+      expect(second).toBe(' then this.');
+    });
+  });
 });
 

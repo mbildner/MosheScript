@@ -15,6 +15,16 @@ describe('#consumeTo', function(){
     parser = new Parser('first this# then this.');
   });
 
+  context('FINISHED', function(){
+    beforeEach(function(){
+     parser.consumeTo('then this.');
+    });
+
+    it('returns null', function(){
+      expect(parser.consumeTo('a')).toBeNull();
+    });
+  });
+
   context('single character', function(){
     it('returns a string through the character', function(){
       var first = parser.consumeTo('#');

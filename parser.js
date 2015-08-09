@@ -13,7 +13,8 @@ function Parser (src){
   var scout = 0;
   var self = this;
 
-  this.FINISHED = false;
+  var FINISHED = false;
+
   this.consumeTo = consumeTo;
 
   function string (){
@@ -30,9 +31,6 @@ function Parser (src){
   }
 
   function advance (){
-    if (scout >= src.length){
-      self.FINISHED = true;
-    }
     scout += 1;
   }
 
@@ -44,7 +42,7 @@ function Parser (src){
     if (isChar) {
       while (currentChar() !== flag){
         advance();
-        if (self.FINISHED){ break; }
+        if (isFinished()){ break; }
       }
       advance();
     }
@@ -52,12 +50,17 @@ function Parser (src){
     if (!isChar) {
       while (!endsWith(string(), flag)){
         advance();
-        if (self.FINISHED){ break; }
+        if (isFinished()){ break; }
       }
     }
   }
 
+  function isFinished (){
+    return FINISHED || scout >= src.length;
+  }
+
   function consumeTo (char){
+    if (isFinished()) { return null; }
     advanceTo(char);
     var str = string();
     finish();

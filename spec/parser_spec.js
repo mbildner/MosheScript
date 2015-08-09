@@ -3,6 +3,59 @@
 var Parser = require('../parser.js');
 
 describe('Parser', function(){
+  describe('#withinBraces', function(){
+    var parser;
+
+    context('inside unbalanced braces', function(){
+      beforeEach(function(){
+        parser = new Parser('first this {and then inside { also } this } k thanks');
+        parser.consumeTo('and then');
+      });
+
+      it('returns true', function(){
+        expect(parser.withinBraces()).toBe(true);
+      });
+    });
+
+    context('outside braces', function(){
+      beforeEach(function(){
+        parser = new Parser('first this {and then inside { also } this } k thanks');
+        parser.consumeTo('thanks');
+      });
+
+      it('returns true', function(){
+        expect(parser.withinBraces()).toBe(false);
+      });
+    });
+  });
+
+
+  describe('#withinParens', function(){
+    var parser;
+
+    context('inside unbalanced parens', function(){
+      beforeEach(function(){
+        parser = new Parser('first this (and then inside ( also ) this ) k thanks');
+        parser.consumeTo('and then');
+      });
+
+      it('returns true', function(){
+        expect(parser.withinParens()).toBe(true);
+      });
+    });
+
+    context('outside parens', function(){
+      beforeEach(function(){
+        parser = new Parser('first this (and then inside ( also ) this ) k thanks');
+        parser.consumeTo('thanks');
+      });
+
+      it('returns true', function(){
+        expect(parser.withinParens()).toBe(false);
+      });
+    });
+  });
+
   describe('#consumeTo', function(){
     var parser;
 

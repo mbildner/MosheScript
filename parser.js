@@ -1,3 +1,5 @@
+var Punctuation = require('./punctuation.js');
+
 function endsWith (haystack, needle){
   'use strict';
   if (typeof needle === 'string') {
@@ -15,7 +17,20 @@ function Parser (src){
 
   var FINISHED = false;
 
+  var punc = new Punctuation();
+
   this.consumeTo = consumeTo;
+
+  this.withinParens = withinParens;
+  this.withinBraces = withinBraces;
+
+  function withinParens (){
+    return !punc.balancedParens();
+  }
+
+  function withinBraces (){
+    return !punc.balancedBraces();
+  }
 
   function string (){
     var str = src.slice(anchor, scout);
@@ -31,6 +46,8 @@ function Parser (src){
   }
 
   function advance (){
+    var char = src.charAt(scout);
+    punc.track(char);
     scout += 1;
   }
 

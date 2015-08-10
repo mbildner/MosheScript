@@ -26,9 +26,19 @@ function Tokenizer (src){
       params.push(param);
     }
 
-    var cleanParams = params.filter(function(statement){
-      return !STRAY_PARAM_REGEX.test(statement);
-    });
+    var cleanParams = params
+      .map(function(statement){
+        return statement
+        .replace(/\s*\)/, '')
+        .replace(/\s*,\s*/, '')
+        .trim()
+      })
+      .filter(function(statement){
+        return statement.length > 0;
+      })
+      .filter(function(statement){
+        return !STRAY_PARAM_REGEX.test(statement);
+      });
 
     parser.consumeTo('{');
 

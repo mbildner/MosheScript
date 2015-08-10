@@ -1,7 +1,6 @@
 var Parser = require('./parser.js');
 
-
-var IDENTIFIER_REGEX = /^func/;
+var IDENTIFIER_REGEX = /(^func)|\w+\s*=/;
 var FUNC_NAME_REGEX = /\s*\(/;
 var PARAM_REGEX = /,|\)/;
 var STRAY_PARAM_REGEX = /\s*\)/;
@@ -12,8 +11,32 @@ function Tokenizer (src){
 
   this.consumeStatement = consumeStatement;
 
-  function consumeStatement (){
-    var identifier = parser.consumeTo(IDENTIFIER_REGEX);
+  function consumeVariable (variableIdentifier){
+    var name = variableIdentifier.replace('=', '').trim();
+
+    var valueToken = parser.consumeTo(/\w+\s/);
+    var cleanValueToken = valueToken
+      .trim()
+      .replace(/'/g, '');
+
+    return {
+      type: 'assignment',
+      value: {
+        left: {
+          type: 'reference',
+          value: {
+            scope: name
+          }
+        },
+        right: {
+          type: 'string',
+          value: cleanValueToken
+        }
+      }
+    };
+  }
+
+  function consumeFunction (){
     var name = parser.consumeTo(FUNC_NAME_REGEX);
 
     var cleanName = name.replace(/\s*\(/, '').replace(/^\s*/, '') || false;
@@ -31,7 +54,7 @@ function Tokenizer (src){
         return statement
         .replace(/\s*\)/, '')
         .replace(/\s*,\s*/, '')
-        .trim()
+        .trim();
       })
       .filter(function(statement){
         return statement.length > 0;
@@ -75,6 +98,19 @@ function Tokenizer (src){
         }
       }
     };
+  }
+
+  function consumeStatement (){
+    var identifier = parser.consumeTo(IDENTIFIER_REGEX);
+
+    switch (identifier){
+      case 'func':
+        return consumeFunction();
+      break;
+
+      default:
+        return consumeVariable(identifier);
+    }
   }
 }
 

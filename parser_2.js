@@ -141,10 +141,7 @@ function Token (raw){
 
     return '<RUNE {' + raw + '}>';
   };
-
-
 }
-
 
 var fs = require('fs');
 var ms = fs.readFileSync('./spec/fixtures/demo.ms', { encoding: 'UTF-8' });
@@ -152,6 +149,5 @@ var ms = fs.readFileSync('./spec/fixtures/demo.ms', { encoding: 'UTF-8' });
 var tokenizer = new Tokenizer(ms);
 
 var tokens = tokenizer.consumeAll();
-console.log(tokens.map(function(q){
-  return q.toString();
-}));
+console.log(tokens.join('\n'));
+

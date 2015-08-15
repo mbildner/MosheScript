@@ -131,26 +131,34 @@ function Token (raw){
 }
 
 function Lexer (src){
-  var punc = new Punctuation();
   var tokenizer = new Tokenizer(src);
 
   this.consumeNext = function (){
+    var next = tokenizer.consumeNext();
+
+    if (next.toString() === '<SINGLE QUOTE>' || next.toString() === '<DOUBLE QUOTE>'){
+      return consumeStringLexeme(next);
+    }
+
+    return next;
+  };
+
+  function consumeStringLexeme (startToken){
+    var punc = new Punctuation();
     var lexeme = new Lexeme();
 
-    var token;
+    punc.track(startToken);
+    lexeme.add(startToken);
 
-    do {
-
-      token = tokenizer.consumeNext();
-      punc.track(token);
-      lexeme.add(token);
-
-      if (!token) return false;
-
-    } while (punc.insideQuotes());
+    var next;
+    while (punc.insideQuotes()){
+      next = tokenizer.consumeNext();
+      punc.track(next);
+      lexeme.add(next);
+    }
 
     return lexeme;
-  };
+  }
 }
 
 function Lexeme (){

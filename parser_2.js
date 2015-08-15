@@ -107,27 +107,91 @@ function Tokenizer (src){
 }
 
 function Token (raw){
-  this.original = raw;
+    if (raw === '\n') {
+      return {
+        type: '<PUNCTUATOR>',
+        str: raw,
+        repr: '<NEW LINE>'
+      };
+    }
 
-  this.toString = function (){
-    if (raw === '\n') return '<NEW LINE>';
+    if (/^\s+$/.test(raw)) {
+      return {
+        type: '<WHITESPACE>',
+        str: raw,
+        repr: '<WHITESPACE {' + raw.length + '}>'
+      };
+    }
 
-    if (/^\s+$/.test(raw)) return '<WHITESPACE {' + raw.length + '}>';
+    if (raw === '\'') {
+      return {
+        type: '<PUNCTUATOR>',
+        str: raw,
+        repr: '<SINGLE QUOTE>'
+      };
+    }
 
-    if (raw === '\'') return '<SINGLE QUOTE>';
-    if (raw === '"') return '<DOUBLE QUOTE>';
+    if (raw === '"') {
+      return {
+        type: '<PUNCTUATOR>',
+        str: raw,
+        repr: '<DOUBLE QUOTE>'
+      };
+    }
 
-    if (raw === '(') return '<OPEN PAREN>';
-    if (raw === ')') return '<CLOSE PAREN>';
+    if (raw === '(') {
+      return {
+        type: '<PUNCTUATOR>',
+        str: raw,
+        repr: '<OPEN PAREN>'
+      };
+    }
 
-    if (raw === '{') return '<OPEN BRACE>';
-    if (raw === '}') return '<CLOSE BRACE>';
+    if (raw === ')') {
+      return {
+        type: '<PUNCTUATOR>',
+        str: raw,
+        repr: '<CLOSE PAREN>'
+      };
+    }
 
-    if (raw === '+') return '<PLUS>';
-    if (raw === '=') return '<EQUAL>';
+    if (raw === '{') {
+      return {
+        type: '<PUNCTUATOR>',
+        str: raw,
+        repr: '<OPEN BRACE>'
+      };
+    }
 
-    return '<RUNE {' + raw + '}>';
-  };
+    if (raw === '}') {
+      return {
+        type: '<PUNCTUATOR>',
+        str: raw,
+        repr: '<CLOSE BRACE>'
+      };
+    }
+
+    if (raw === '+') {
+      return {
+        type: '<OPERATOR>',
+        str: raw,
+        repr: '<PLUS>'
+      };
+    }
+
+    if (raw === '=') {
+      return {
+        type: '<OPERATOR>',
+        str: raw,
+        repr: '<EQUALS>'
+      };
+    }
+
+    return {
+      type: '<RUNE>',
+      str: raw,
+      repr: '<RUNE {' + raw + '}>'
+    };
 }
 
 function Lexer (src){
@@ -136,12 +200,21 @@ function Lexer (src){
   this.consumeNext = function (){
     var next = tokenizer.consumeNext();
 
-    if (next.toString() === '<SINGLE QUOTE>' || next.toString() === '<DOUBLE QUOTE>'){
+    if (!next) { return false ;}
+
+    if (next.repr === '<SINGLE QUOTE>' || next.repr === '<DOUBLE QUOTE>'){
       return consumeStringLexeme(next);
     }
 
-    return next;
+    return consumeGenericLexeme(next);
   };
+
+  function consumeGenericLexeme (startToken){
+    var lexeme = new Lexeme();
+    lexeme.add(startToken);
+    lexeme.setType(startToken.type);
+    return lexeme;
+  }
 
   function consumeStringLexeme (startToken){
     var punc = new Punctuation();
@@ -149,6 +222,7 @@ function Lexer (src){
 
     punc.track(startToken);
     lexeme.add(startToken);
+    lexeme.setType('<STRING>');
 
     var next;
     while (punc.insideQuotes()){
@@ -168,21 +242,15 @@ function Lexeme (){
     holder.push(token);
   };
 
-  function repr (){
-    var isString = holder.length > 1;
-
-    if(!isString){
-      return holder[0].toString();
-    }
-
-    return '<STRING ' + holder
-      .map(function(token){
-        return token.original;
-      }).join('') + '>';
-  }
+  this.type = null;
+  this.setType = function(type){
+    this.type = type;
+  };
 
   this.toString = function(){
-    return repr();
+    return token.type + '\n\t' + holder.map(function(token){
+      return token.repr;
+    }).join('');
   };
 }
 
@@ -190,7 +258,7 @@ function Punctuation (){
   var inside = false;
 
   this.track = function (token){
-    if (token.original === '\''){
+    if (token.str === '\''){
       inside = !inside;
     }
   };
@@ -205,7 +273,6 @@ var ms = fs.readFileSync('./spec/fixtures/demo.ms', { encoding: 'UTF-8' });
 
 var lexer = new Lexer(ms);
 
-var tokens = [];
 var token;
 while ((token = lexer.consumeNext())){
   console.log(token.toString());

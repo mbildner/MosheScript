@@ -1,5 +1,5 @@
 func greet (name) {
-  return 'hello ' + name
+  return 'hello {' + name
 }
 
 name = 'moshe'

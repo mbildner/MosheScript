@@ -81,8 +81,6 @@ function Parser (src){
     }
     advance();
 
-    var token;
-
     if (FINISHED) {
       return false;
     }
@@ -106,17 +104,6 @@ function Tokenizer (src){
   function tokenize (raw){
     return new Token(raw);
   }
-
-  this.consumeAll = function(){
-    var tokens = [];
-    var token;
-
-    while ((token = this.consumeNext())) {
-      tokens.push(token);
-    }
-
-    return tokens;
-  };
 }
 
 function Token (raw){
@@ -143,11 +130,75 @@ function Token (raw){
   };
 }
 
+function Lexer (src){
+  var punc = new Punctuation();
+  var tokenizer = new Tokenizer(src);
+
+  this.consumeNext = function (){
+    var lexeme = new Lexeme();
+
+    var token;
+
+    do {
+
+      token = tokenizer.consumeNext();
+      punc.track(token);
+      lexeme.add(token);
+
+      if (!token) return false;
+
+    } while (punc.insideQuotes());
+
+    return lexeme;
+  };
+}
+
+function Lexeme (){
+  var holder = [];
+
+  this.add = function (token){
+    holder.push(token);
+  };
+
+  function repr (){
+    var isString = holder.length > 1;
+
+    if(!isString){
+      return holder[0].toString();
+    }
+
+    return '<STRING ' + holder
+      .map(function(token){
+        return token.original;
+      }).join('') + '>';
+  }
+
+  this.toString = function(){
+    return repr();
+  };
+}
+
+function Punctuation (){
+  var inside = false;
+
+  this.track = function (token){
+    if (token.original === '\''){
+      inside = !inside;
+    }
+  };
+
+  this.insideQuotes = function (){
+    return inside;
+  };
+}
+
 var fs = require('fs');
 var ms = fs.readFileSync('./spec/fixtures/demo.ms', { encoding: 'UTF-8' });
 
-var tokenizer = new Tokenizer(ms);
+var lexer = new Lexer(ms);
 
-var tokens = tokenizer.consumeAll();
-console.log(tokens.join('\n'));
-
+var tokens = [];
+var token;
+while ((token = lexer.consumeNext())){
+  console.log(token.toString());
+}

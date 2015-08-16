@@ -1,12 +1,12 @@
-var Lexer = require('./lib/lexer.js');
+var CompositeTokenizer = require('./lib/composite_tokenizer.js');
 
 var fs = require('fs');
 var ms = fs.readFileSync('./spec/fixtures/demo.ms', { encoding: 'UTF-8' });
 
-var lexer = new Lexer(ms);
+var tokenizer = new CompositeTokenizer(ms);
 
 var token;
-while ((token = lexer.consumeNext())){
+while ((token = tokenizer.consumeNext())){
   console.log(token.toString());
 }
 

@@ -1,88 +1,99 @@
-var Punctuation = require('./punctuation.js');
-
-function endsWith (haystack, needle){
-  'use strict';
-  if (typeof needle === 'string') {
-    needle = new RegExp(needle + '$');
-  }
-
-  return needle.test(haystack);
-}
-
 function Parser (src){
   'use strict';
-  var anchor = 0;
-  var scout = 0;
+
+  var i = 0;
+  var j = 0;
+  var n = 1;
+
   var self = this;
 
   var FINISHED = false;
 
-  var punc = new Punctuation();
+  this.finished = function(){
+    return FINISHED;
+  };
 
-  this.consumeTo = consumeTo;
+  this.finishInput = function (){
+    FINISHED = true;
+  };
 
-  this.withinParens = withinParens;
-  this.withinBraces = withinBraces;
+  this.consumeNext = consumeNext;
 
-  function withinParens (){
-    return !punc.balancedParens();
+  function peek (){
+    return src.charAt(n);
   }
 
-  function withinBraces (){
-    return !punc.balancedBraces();
-  }
-
-  function string (){
-    var str = src.slice(anchor, scout);
-    return str;
-  }
-
-  function currentChar (){
-    return src.charAt(scout);
-  }
-
-  function finish (){
-    anchor = scout;
+  function char (){
+    return src.charAt(i);
   }
 
   function advance (){
-    var char = src.charAt(scout);
-    punc.track(char);
-    scout += 1;
+    i++;
+    n++;
   }
 
-  function advanceTo (flag){
-    var isChar = typeof flag === 'string' && flag.length < 2;
-    var isString = typeof flag === 'string' && flag.length > 1;
-    var isRegex = typeof flag !== 'string';
-
-    if (isChar) {
-      while (currentChar() !== flag){
-        advance();
-        if (isFinished()){ break; }
-      }
-      advance();
-    }
-
-    if (!isChar) {
-      while (!endsWith(string(), flag)){
-        advance();
-        if (isFinished()){ break; }
-      }
-    }
-  }
-
-  function isFinished (){
-    return FINISHED || scout >= src.length;
-  }
-
-  function consumeTo (char){
-    if (isFinished()) { return null; }
-    advanceTo(char);
-    var str = string();
-    finish();
+  function consume (){
+    var str = src.slice(j, i);
+    j = i;
     return str;
   }
+
+  function atBoundary (){
+    var next = peek();
+    var current = char();
+
+    var WS_STARTING = current !== ' ' && next === ' ';
+    var WS_ENDING = current === ' ' && next !== ' ';
+    var WS = WS_STARTING || WS_ENDING;
+
+    var NEW_LINE = current === '\n';
+    var END_OF_LINE = next === '\n';
+
+    var PLUS = next === '+';
+    var EQUALS = next === '=';
+    var END_OF_INPUT = i > src.length;
+    var SINGLE_QUOTE = current === '\'' || next === '\'';
+    var DOUBLE_QUOTE = current === '"' || next === '"';
+
+    var CLOSE_BRACE = current === '}';
+    var OPEN_BRACE = current === '{';
+
+    var CLOSE_PAREN = next === ')';
+    var OPEN_PAREN = next === '(' || current === '(';
+
+    if (END_OF_INPUT) self.finishInput();
+
+    return WS       ||
+      END_OF_LINE   ||
+      NEW_LINE      ||
+      PLUS          ||
+      EQUALS        ||
+      END_OF_INPUT  ||
+      SINGLE_QUOTE  ||
+      DOUBLE_QUOTE  ||
+      OPEN_BRACE    ||
+      CLOSE_BRACE   ||
+      OPEN_PAREN    ||
+      CLOSE_PAREN;
+  }
+
+  function consumeNext (){
+    while (!atBoundary()){
+      advance();
+    }
+    advance();
+
+    if (FINISHED) {
+      return false;
+    }
+
+    if (i === 1) {
+      return '<BEGIN_INPUT>';
+    }
+
+    return consume();
+  }
 }
+
 
 module.exports = Parser;

@@ -1,4 +1,5 @@
 var Token = require('./token.js');
+var Tokenizer = require('./tokenizer.js');
 
 function Parser (src){
   var i = 0;
@@ -95,19 +96,6 @@ function Parser (src){
   }
 }
 
-function Tokenizer (src){
-  var parser = new Parser(src);
-
-  this.consumeNext = function(){
-    var raw = parser.consumeNext();
-    return raw ? tokenize(raw) : false;
-  };
-
-  function tokenize (raw){
-    return new Token(raw);
-  }
-}
-
 function Lexer (src){
   var tokenizer = new Tokenizer(src);
 
@@ -182,12 +170,3 @@ function Punctuation (){
   };
 }
 
-var fs = require('fs');
-var ms = fs.readFileSync('./spec/fixtures/demo.ms', { encoding: 'UTF-8' });
-
-var lexer = new Lexer(ms);
-
-var token;
-while ((token = lexer.consumeNext())){
-  console.log(token.toString());
-}

@@ -1,4 +1,4 @@
-function Token (raw){
+ function Token (raw){
   'use strict';
   if (raw === '\n') {
     return {

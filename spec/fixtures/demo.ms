@@ -1,3 +1,7 @@
+first = 'moshe'
+
+last = 'bildner'
+
 func greet (name) {
   return 'hello {' + name
 }

@@ -19,7 +19,6 @@ var expressions = new ExpressionFactory(ms);
 
 var expression;
 while((expression = expressions.consumeNext())){
-  // console.log(expression);
   console.log(expression.toString());
 }
 

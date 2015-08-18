@@ -50,7 +50,6 @@ function ExpressionBuilder (src){
     n = this.next();
 
     if (c.type === types.RUNE && n.type === types.EQUALS){
-      // console.log('assignment!');
       exp = new Assignment(c);
       this.advance();
       this.advance();
@@ -58,16 +57,12 @@ function ExpressionBuilder (src){
     }
 
     if (c.type === types.OPEN_PAREN && n.type === types.RUNE){
-      // console.log('rune arg');
-      // console.log('reference!');
       exp = new Reference(c);
       this.advance();
       this.advance();
     }
 
     if (c.type === types.OPEN_PAREN && n.type === types.STRING){
-      // console.log('string arg');
-      // console.log('reference!');
       exp = new Value(c);
       this.advance();
       this.advance();
@@ -79,21 +74,18 @@ function ExpressionBuilder (src){
     }
 
     if (c.type === types.RUNE && n.type === types.OPEN_PAREN){
-      // console.log('call!');
       exp = new Call(c);
       this.advance();
       exp.addArg(this.consumeNext());
     }
 
     if (c.type === types.RUNE && n.type === types.CLOSE_PAREN){
-      // console.log('reference!');
       exp = new Reference(c);
       this.advance();
       this.advance();
     }
 
     if (c.type === types.STRING && n.type !== types.PLUS){
-      // console.log('string!');
       exp = new Value(c);
       this.advance();
     }

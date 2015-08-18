@@ -4,40 +4,26 @@ var fs = require('fs');
 var ms = fs.readFileSync('./spec/fixtures/demo.ms', { encoding: 'UTF-8' });
 var types = require('./lib/types.js');
 
-function ExpressionFactory (src){
+function WhiteSpaceStripper (src){
   var tokenizer = new CompositeTokenizer(ms);
 
-  var current;
-  var next = tokenizer.consumeNext();
+  this.consumeNext = function(){
+    var next = tokenizer.consumeNext();
 
-  // fast forward whitespace
-  while (next.type === types.WHITESPACE || next.type === types.NEW_LINE){
-    next = tokenizer.consumeNext();
-  }
+    if (!next) { return false; }
 
-  this.advance = function(){
-    // original next is never whitespace
-    current = next;
+    while (next.type === types.WHITESPACE || next.type === types.NEW_LINE) {
+      return this.consumeNext();
+    }
 
-    do {
-      next = tokenizer.consumeNext();
-    } while (next.type === types.WHITESPACE || next.type === types.NEW_LINE);
-
-    return current;
+    return next;
   };
-
-  this.current = function() { return current; };
-  this.peek = function() { return next; };
 }
 
-var expressions = new ExpressionFactory(ms);
+var tokenizer = new WhiteSpaceStripper(ms);
 
-var expression;
-while((expression = expressions.advance())){
-
-  console.log(expressions.current());
-  console.log(expressions.peek());
-
-
+var a;
+while ((a = tokenizer.consumeNext())){
+  console.log(a);
 }
 

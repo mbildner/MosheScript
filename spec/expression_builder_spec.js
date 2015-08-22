@@ -34,6 +34,7 @@ describe('ExpressionBuilder', function(){
       var exp0 = builder.consumeNext();
       var exp1 = builder.consumeNext();
       var exp2 = builder.consumeNext();
+      var exp3 = builder.consumeNext();
 
       var assignment0 = {
         type: expressionTypes.ASSIGNMENT,
@@ -62,9 +63,19 @@ describe('ExpressionBuilder', function(){
         }
       };
 
+      var assignment3 = {
+        type: expressionTypes.ASSIGNMENT,
+        name: Token.for('name', types.RUNE),
+        value: {
+          type: expressionTypes.REFERENCE,
+          value: Token.for('first', types.RUNE)
+        }
+      };
+
       expect(JSON.stringify(exp0)).toBe(JSON.stringify(assignment0));
       expect(JSON.stringify(exp1)).toBe(JSON.stringify(assignment1));
       expect(JSON.stringify(exp2)).toBe(JSON.stringify(assignment2));
+      expect(JSON.stringify(exp3)).toBe(JSON.stringify(assignment3));
     });
   });
 });

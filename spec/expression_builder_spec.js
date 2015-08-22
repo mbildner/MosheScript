@@ -6,7 +6,8 @@ var expressionTypes = require('../lib/expression_types.js');
 var fs = require('fs');
 
 var fixtures = {
-  simpleAssignment: fs.readFileSync('spec/fixtures/simple_assignment.ms', { encoding: 'UTF-8' })
+  simpleAssignment: fs.readFileSync('spec/fixtures/simple_assignment.ms', { encoding: 'UTF-8' }),
+  addition: fs.readFileSync('spec/fixtures/addition_expression.ms', { encoding: 'UTF-8' })
 };
 
 var expressionTypes = require('../lib/expression_types.js');
@@ -27,6 +28,30 @@ function strToken(str){
 }
 
 describe('ExpressionBuilder', function(){
+  describe('operators', function(){
+    context('plus', function(){
+      builder = new ExpressionBuilder(fixtures.addition);
+
+      it('returns an addition expression', function(){
+        var exp = builder.consumeNext();
+
+        var addition = {
+          type: expressionTypes.ADDITION,
+          left: {
+            type: expressionTypes.VALUE,
+            value: Token.for('12', types.NUMBER)
+          },
+          right: {
+            type: expressionTypes.VALUE,
+            value: Token.for('43', types.NUMBER)
+          }
+        };
+
+        expect(JSON.stringify(exp)).toBe(JSON.stringify(addition));
+      });
+    });
+  });
+
   describe('variable assignment', function(){
     context('chained assignment', function(){
       it('assigns values to multiple variables', function(){

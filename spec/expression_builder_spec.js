@@ -27,66 +27,97 @@ function strToken(str){
 }
 
 describe('ExpressionBuilder', function(){
-  context('variable assignment', function(){
-    it('assigns primitives to variables', function(){
-      builder = new ExpressionBuilder(fixtures.simpleAssignment);
+  describe('variable assignment', function(){
+    context('chained assignment', function(){
+      it('assigns values to multiple variables', function(){
+        builder = new ExpressionBuilder('a = b = c = d = 1\n');
 
-      var exp0 = builder.consumeNext();
-      var exp1 = builder.consumeNext();
-      var exp2 = builder.consumeNext();
-      var exp3 = builder.consumeNext();
-      var exp4 = builder.consumeNext();
+        var exp0 = builder.consumeNext();
+        var assignment0 = {
+          type: expressionTypes.ASSIGNMENT,
+          name: Token.for('a', types.RUNE),
+            value: {
+              type: expressionTypes.ASSIGNMENT,
+              name: Token.for('b', types.RUNE),
+              value: {
+                type: expressionTypes.ASSIGNMENT,
+                name: Token.for('c', types.RUNE),
+                value: {
+                  type: expressionTypes.ASSIGNMENT,
+                  name: Token.for('d', types.RUNE),
+                  value: {
+                    type: expressionTypes.VALUE,
+                    value: Token.for("1", types.NUMBER)
+                  }
+                }
+              }
+            }
+        };
 
-      var assignment0 = {
-        type: expressionTypes.ASSIGNMENT,
-        name: Token.for('first', types.RUNE),
-        value: {
-          type: expressionTypes.VALUE,
-          value: strToken('moshe')
-        }
-      };
+        expect(JSON.stringify(exp0)).toBe(JSON.stringify(assignment0));
+      });
+    });
+    context('simple assignment', function(){
+      it('assigns primitives to variables', function(){
+        builder = new ExpressionBuilder(fixtures.simpleAssignment);
 
-      var assignment1 = {
-        type: expressionTypes.ASSIGNMENT,
-        name: Token.for('last', types.RUNE),
-        value: {
-          type: expressionTypes.VALUE,
-          value: strToken('bildner')
-        }
-      };
+        var exp0 = builder.consumeNext();
+        var exp1 = builder.consumeNext();
+        var exp2 = builder.consumeNext();
+        var exp3 = builder.consumeNext();
+        var exp4 = builder.consumeNext();
 
-      var assignment2 = {
-        type: expressionTypes.ASSIGNMENT,
-        name: Token.for('student_id', types.RUNE),
-        value: {
-          type: expressionTypes.VALUE,
-          value: Token.for('123123', types.NUMBER)
-        }
-      };
+        var assignment0 = {
+          type: expressionTypes.ASSIGNMENT,
+          name: Token.for('first', types.RUNE),
+            value: {
+              type: expressionTypes.VALUE,
+              value: strToken('moshe')
+            }
+        };
 
-      var assignment3 = {
-        type: expressionTypes.ASSIGNMENT,
-        name: Token.for('name', types.RUNE),
-        value: {
-          type: expressionTypes.REFERENCE,
-          value: Token.for('first', types.RUNE)
-        }
-      };
+        var assignment1 = {
+          type: expressionTypes.ASSIGNMENT,
+          name: Token.for('last', types.RUNE),
+            value: {
+              type: expressionTypes.VALUE,
+              value: strToken('bildner')
+            }
+        };
 
-      var assignment4 = {
-        type: expressionTypes.SCOPED_ASSIGNMENT,
-        name: Token.for('age', types.RUNE),
-          value: {
-            type: expressionTypes.VALUE,
-            value: Token.for('26', types.NUMBER)
-          }
-      };
+        var assignment2 = {
+          type: expressionTypes.ASSIGNMENT,
+          name: Token.for('student_id', types.RUNE),
+            value: {
+              type: expressionTypes.VALUE,
+              value: Token.for('123123', types.NUMBER)
+            }
+        };
 
-      expect(JSON.stringify(exp0)).toBe(JSON.stringify(assignment0));
-      expect(JSON.stringify(exp1)).toBe(JSON.stringify(assignment1));
-      expect(JSON.stringify(exp2)).toBe(JSON.stringify(assignment2));
-      expect(JSON.stringify(exp3)).toBe(JSON.stringify(assignment3));
-      expect(JSON.stringify(exp4)).toBe(JSON.stringify(assignment4));
+        var assignment3 = {
+          type: expressionTypes.ASSIGNMENT,
+          name: Token.for('name', types.RUNE),
+            value: {
+              type: expressionTypes.REFERENCE,
+              value: Token.for('first', types.RUNE)
+            }
+        };
+
+        var assignment4 = {
+          type: expressionTypes.SCOPED_ASSIGNMENT,
+          name: Token.for('age', types.RUNE),
+            value: {
+              type: expressionTypes.VALUE,
+              value: Token.for('26', types.NUMBER)
+            }
+        };
+
+        expect(JSON.stringify(exp0)).toBe(JSON.stringify(assignment0));
+        expect(JSON.stringify(exp1)).toBe(JSON.stringify(assignment1));
+        expect(JSON.stringify(exp2)).toBe(JSON.stringify(assignment2));
+        expect(JSON.stringify(exp3)).toBe(JSON.stringify(assignment3));
+        expect(JSON.stringify(exp4)).toBe(JSON.stringify(assignment4));
+      });
     });
   });
 });

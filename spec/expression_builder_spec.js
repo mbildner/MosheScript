@@ -30,12 +30,15 @@ function strToken(str){
 describe('ExpressionBuilder', function(){
   describe('operators', function(){
     context('plus', function(){
-      builder = new ExpressionBuilder(fixtures.addition);
+      var builder;
+      beforeEach(function(){
+        builder = new ExpressionBuilder(fixtures.addition);
+      });
 
       context('a pair of strings', function(){
         it('returns an addition expression', function(){
-          var exp0 = builder.consumeNext();
-          var addition0 = {
+          var exp = builder.consumeNext();
+          var addition = {
             type: expressionTypes.ADDITION,
             left: {
               type: expressionTypes.VALUE,
@@ -46,15 +49,16 @@ describe('ExpressionBuilder', function(){
             value: Token.for('43', types.NUMBER)
           }
           };
-          expect(JSON.stringify(exp0)).toBe(JSON.stringify(addition0));
+          expect(JSON.stringify(exp)).toBe(JSON.stringify(addition));
         });
       });
 
       context('a pair of numbers', function(){
         it('returns an addition expression', function(){
-          var exp1 = builder.consumeNext();
+          builder.consumeNext();
+          var exp = builder.consumeNext();
 
-          var addition1 = {
+          var addition = {
             type: expressionTypes.ADDITION,
             left: {
               type: expressionTypes.VALUE,
@@ -66,9 +70,8 @@ describe('ExpressionBuilder', function(){
             }
           };
 
-          expect(JSON.stringify(exp1)).toBe(JSON.stringify(addition1));
+          expect(JSON.stringify(exp)).toBe(JSON.stringify(addition));
         });
-
       });
     });
   });

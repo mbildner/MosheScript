@@ -4,8 +4,6 @@
 
 first + last
 
-first + 'hello'
+dat_rune_doe + 'and_dat_string'
 
-12 + 43 + 2 + 1
-
-a = 12 + 32 + 2
+21 + second

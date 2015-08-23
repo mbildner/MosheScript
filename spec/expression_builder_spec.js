@@ -28,11 +28,58 @@ function strToken(str){
 }
 
 describe('ExpressionBuilder', function(){
+  describe('end of input', function(){
+    context('when finished with input', function(){
+      it('returns false', function(){
+        var builder = new ExpressionBuilder('variable = 12\n');
+        builder.consumeNext();
+        expect(builder.consumeNext()).toBe(false);
+      });
+    });
+  });
+
   describe('operators', function(){
     context('plus', function(){
       var builder;
       beforeEach(function(){
         builder = new ExpressionBuilder(fixtures.addition);
+      });
+
+      context('one variable one primitive', function(){
+        it('returns an addition expression', function(){
+          builder.consumeNext();
+          builder.consumeNext();
+          builder.consumeNext();
+
+          var exp0 = builder.consumeNext();
+          var exp1 = builder.consumeNext();
+
+          var addition0 = {
+            type: expressionTypes.ADDITION,
+            left: {
+              type: expressionTypes.REFERENCE,
+              value: Token.for('dat_rune_doe', types.RUNE)
+            },
+            right: {
+              type: expressionTypes.VALUE,
+              value: strToken('and_dat_string')
+            },
+          };
+
+          var addition1 = {
+            type: expressionTypes.ADDITION,
+            left: {
+              type: expressionTypes.VALUE,
+              value: Token.for('21', types.NUMBER)
+            },
+            right: {
+              type: expressionTypes.REFERENCE,
+              value: Token.for('second', types.RUNE)
+            }
+          };
+          expect(JSON.stringify(exp0)).toBe(JSON.stringify(addition0));
+          expect(JSON.stringify(exp1)).toBe(JSON.stringify(addition1));
+        });
       });
 
       context('a pair of variables', function(){

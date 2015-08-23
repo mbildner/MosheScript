@@ -23,7 +23,7 @@ function strToken(str){
 
   return Token.for(
     internal,
-  types.STRING
+    types.STRING
   );
 }
 
@@ -33,6 +33,28 @@ describe('ExpressionBuilder', function(){
       var builder;
       beforeEach(function(){
         builder = new ExpressionBuilder(fixtures.addition);
+      });
+
+      context('a pair of variables', function(){
+        it('returns an addition expression', function(){
+          builder.consumeNext();
+          builder.consumeNext();
+          var exp = builder.consumeNext();
+
+          var addition = {
+            type: expressionTypes.ADDITION,
+            left: {
+              type: expressionTypes.REFERENCE,
+              value: Token.for('first', types.RUNE)
+            },
+            right: {
+              type: expressionTypes.REFERENCE,
+              value: Token.for('last', types.RUNE)
+            },
+          };
+
+          expect(JSON.stringify(exp)).toBe(JSON.stringify(addition));
+        });
       });
 
       context('a pair of strings', function(){

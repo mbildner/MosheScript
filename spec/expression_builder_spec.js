@@ -23,7 +23,7 @@ function strToken(str){
 
   return Token.for(
     internal,
-    types.STRING
+  types.STRING
   );
 }
 
@@ -32,22 +32,43 @@ describe('ExpressionBuilder', function(){
     context('plus', function(){
       builder = new ExpressionBuilder(fixtures.addition);
 
-      it('returns an addition expression', function(){
-        var exp = builder.consumeNext();
-
-        var addition = {
-          type: expressionTypes.ADDITION,
-          left: {
-            type: expressionTypes.VALUE,
-            value: Token.for('12', types.NUMBER)
-          },
+      context('a pair of strings', function(){
+        it('returns an addition expression', function(){
+          var exp0 = builder.consumeNext();
+          var addition0 = {
+            type: expressionTypes.ADDITION,
+            left: {
+              type: expressionTypes.VALUE,
+              value: Token.for('12', types.NUMBER)
+            },
           right: {
             type: expressionTypes.VALUE,
             value: Token.for('43', types.NUMBER)
           }
-        };
+          };
+          expect(JSON.stringify(exp0)).toBe(JSON.stringify(addition0));
+        });
+      });
 
-        expect(JSON.stringify(exp)).toBe(JSON.stringify(addition));
+      context('a pair of numbers', function(){
+        it('returns an addition expression', function(){
+          var exp1 = builder.consumeNext();
+
+          var addition1 = {
+            type: expressionTypes.ADDITION,
+            left: {
+              type: expressionTypes.VALUE,
+              value: strToken('hello')
+            },
+            right: {
+              type: expressionTypes.VALUE,
+              value: strToken('world')
+            }
+          };
+
+          expect(JSON.stringify(exp1)).toBe(JSON.stringify(addition1));
+        });
+
       });
     });
   });
@@ -64,18 +85,18 @@ describe('ExpressionBuilder', function(){
             value: {
               type: expressionTypes.ASSIGNMENT,
               name: Token.for('b', types.RUNE),
-              value: {
-                type: expressionTypes.ASSIGNMENT,
-                name: Token.for('c', types.RUNE),
                 value: {
                   type: expressionTypes.ASSIGNMENT,
-                  name: Token.for('d', types.RUNE),
-                  value: {
-                    type: expressionTypes.VALUE,
-                    value: Token.for("1", types.NUMBER)
-                  }
+                  name: Token.for('c', types.RUNE),
+                    value: {
+                      type: expressionTypes.ASSIGNMENT,
+                      name: Token.for('d', types.RUNE),
+                        value: {
+                          type: expressionTypes.VALUE,
+                          value: Token.for("1", types.NUMBER)
+                        }
+                    }
                 }
-              }
             }
         };
 
